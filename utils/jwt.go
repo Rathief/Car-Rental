@@ -3,7 +3,6 @@ package utils
 import (
 	"errors"
 	"fmt"
-	"net/http"
 	"os"
 	"strings"
 
@@ -11,7 +10,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func GenerateToken(c echo.Context, id uint, role string) error {
+func GenerateToken(c echo.Context, id uint, role string) (string, error) {
 	// create claims
 	claims := jwt.MapClaims{
 		"userID":   id,
@@ -22,12 +21,10 @@ func GenerateToken(c echo.Context, id uint, role string) error {
 
 	signedToken, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
 	if err != nil {
-		return err
+		return "", err
 	}
-	c.JSON(http.StatusAccepted, map[string]any{
-		"token": signedToken,
-	})
-	return nil
+
+	return signedToken, nil
 }
 func DecodeToken(c echo.Context) (jwt.MapClaims, error) {
 	authHeader := c.Request().Header.Get("Authorization")

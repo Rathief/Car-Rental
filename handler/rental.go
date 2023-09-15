@@ -10,6 +10,18 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+// GetUserRents godoc
+//
+//	@Summary		Get user rents
+//	@Description	Show all user's rents, user identity defined from token claims
+//	@Tags			Rental
+//	@Accept			json
+//	@Produce		json
+//	@Param			token	body		string	true	"Signed token string"
+//	@Success		200		{array}		entity.Record
+//	@Failure		400		{object}	utils.ErrorResponse
+//	@Failure		401		{object}	utils.ErrorResponse
+//	@Router			/rent/ [get]
 func (rh RentalHandler) GetUserRents(c echo.Context) error {
 	// get user id
 	claims, err := utils.DecodeToken(c)
@@ -29,6 +41,20 @@ func (rh RentalHandler) GetUserRents(c echo.Context) error {
 	c.JSON(http.StatusOK, records)
 	return nil
 }
+
+// RentAProduct godoc
+//
+//	@Summary		Create new rent
+//	@Description	Create a new rent for logged in user
+//	@Tags			Rental
+//	@Accept			json
+//	@Produce		json
+//	@Param			token	body		string	true	"Signed token string"
+//	@Success		200		{object}	string
+//	@Failure		400		{object}	utils.ErrorResponse
+//	@Failure		401		{object}	utils.ErrorResponse
+//	@Failure		500		{object}	utils.ErrorResponse
+//	@Router			/rent/ [post]
 func (rh RentalHandler) RentAProduct(c echo.Context) error {
 	// get user id from token
 	claims, err := utils.DecodeToken(c)
@@ -102,6 +128,13 @@ func (rh RentalHandler) RentAProduct(c echo.Context) error {
 		"user_balance":  user.Deposit,
 	}); err != nil {
 		utils.HandleError(c, http.StatusInternalServerError, err, "Error writing json response")
+		return err
+	}
+
+	// send email notification
+	err = utils.SendEmail(user.Email, "Thank you for renting from us!", fmt.Sprintf("<h1>Thank you!</h1><br><p>Thank you for using our service!<br>Your Car Rental Deposit is now %v.</p>", user.Deposit))
+	if err != nil {
+		utils.HandleError(c, http.StatusInternalServerError, err, "Error sending email")
 		return err
 	}
 	return nil

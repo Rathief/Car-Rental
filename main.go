@@ -13,15 +13,14 @@ import (
 	echoSwagger "github.com/swaggo/echo-swagger"
 )
 
-// @title Car Rental API
-// @version 0.1
-// @description A Car Rental API for H8 Phase 2 Project
+//	@title			Car Rental API
+//	@version		0.1
+//	@description	A Car Rental API for H8 Phase 2 Project
 
-// @license.name Apache 2.0
-// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+//	@license.name	None
 
-// @host localhost:8080
-// @BasePath /
+//	@host		localhost:8080
+//	@BasePath	/
 func main() {
 	err := godotenv.Load()
 	if err != nil {

@@ -1,4 +1,445 @@
+basePath: /
+definitions:
+  entity.Product:
+    properties:
+      category:
+        description: car,motorcycle
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      records:
+        items:
+          $ref: '#/definitions/entity.Record'
+        type: array
+      rental_price:
+        type: number
+      stock:
+        type: integer
+    type: object
+  entity.Record:
+    properties:
+      end_date:
+        type: string
+      id:
+        type: integer
+      product_id:
+        type: integer
+      start_date:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  entity.TopUp:
+    properties:
+      deposit:
+        type: number
+    type: object
+  entity.User:
+    properties:
+      deposit:
+        type: number
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      password:
+        type: string
+      records:
+        items:
+          $ref: '#/definitions/entity.Record'
+        type: array
+      role:
+        description: customer,admin
+        type: string
+    type: object
+  utils.ErrorResponse:
+    properties:
+      details: {}
+      error:
+        type: string
+    type: object
+host: localhost:8080
 info:
   contact: {}
-paths: {}
+  description: A Car Rental API for H8 Phase 2 Project
+  license:
+    name: None
+  title: Car Rental API
+  version: "0.1"
+paths:
+  /products/:
+    get:
+      consumes:
+      - application/json
+      description: Show all products and related rents
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Product'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Show all products
+      tags:
+      - Product
+    post:
+      consumes:
+      - application/json
+      description: Insert new product data
+      parameters:
+      - description: Product Data
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Product'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/entity.Product'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Create product
+      tags:
+      - Product
+  /products/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete product targeted by the given ID and related rent data
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Delete product
+      tags:
+      - Product
+    get:
+      consumes:
+      - application/json
+      description: Show product by id from url
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Product'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Show product
+      tags:
+      - Product
+    put:
+      consumes:
+      - application/json
+      description: Update product targeted by the given ID using given product data
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Product Data
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Product'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Product'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Update product
+      tags:
+      - Product
+  /rent/:
+    get:
+      consumes:
+      - application/json
+      description: Show all user's rents, user identity defined from token claims
+      parameters:
+      - description: Signed token string
+        in: body
+        name: token
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Record'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Get user rents
+      tags:
+      - Rental
+    post:
+      consumes:
+      - application/json
+      description: Create a new rent for logged in user
+      parameters:
+      - description: Signed token string
+        in: body
+        name: token
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Create new rent
+      tags:
+      - Rental
+  /users/:
+    get:
+      consumes:
+      - application/json
+      description: Show all users and their rents in JSON form
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.User'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Show all users
+      tags:
+      - User
+  /users/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Show user by id from url
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Show user
+      tags:
+      - User
+  /users/login:
+    post:
+      consumes:
+      - application/json
+      description: Login by json and returns jwt token
+      parameters:
+      - description: Login user
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/entity.User'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Login User
+      tags:
+      - User
+  /users/register:
+    post:
+      consumes:
+      - application/json
+      description: Register a user by json, notify the registered account, and returns
+        a jwt token. Email will be validated first.
+      parameters:
+      - description: Register user
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/entity.User'
+      produces:
+      - application/json
+      - text/html
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/entity.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Register User
+      tags:
+      - User
+  /users/topup:
+    post:
+      consumes:
+      - application/json
+      description: Top up the user's deposit by the specified amount, and send an
+        email notification
+      parameters:
+      - description: Top up amount
+        in: body
+        name: amount
+        required: true
+        schema:
+          $ref: '#/definitions/entity.TopUp'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User deposit after top up
+          schema:
+            $ref: '#/definitions/entity.TopUp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Top up user deposit
+      tags:
+      - User
 swagger: "2.0"
